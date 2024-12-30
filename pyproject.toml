@@ -9,9 +9,8 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-
-
-[tool.poetry.group.bot.dependencies]
+rich = "^13.9.4"
+appwrite = "^7.0.1"
 discord-py = "^2.4.0"
 python-dotenv = "^1.0.1"
 

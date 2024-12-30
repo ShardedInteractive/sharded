@@ -1,5 +1,8 @@
 import discord
 import os
+# skipcq: PYL-W0622
+from rich import print
+from rich.panel import Panel
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -26,4 +29,5 @@ async def ping(ctx):
     await ctx.send(embed=embed)
 
 if __name__ == '__main__':
+    print(Panel('Make sure your [yellow].env[/yellow] file is setup properly for the self hosted instance.', title="Warning", expand=False))
     client.run(TOKEN)
