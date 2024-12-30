@@ -1,4 +1,4 @@
-![Sharded Banner](imgs\sharded-banner.png)
+![Sharded Banner](imgs/sharded-banner.png)
 
 <a href="https://app.deepsource.com/gh/ShardedInitiative/sharded/" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://app.deepsource.com/gh/ShardedInitiative/sharded.svg/?label=code+coverage&show_trend=true&token=NSg646cppOlj7FdQYm4fFR7C"/>
 </a>
