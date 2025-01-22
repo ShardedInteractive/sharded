@@ -1,34 +1,37 @@
+import logging
 import discord
 import os
-import logging
 # skipcq: PYL-W0622
 from rich import print
 from rich.panel import Panel
 from rich.logging import RichHandler
 from rich.console import Console
 from discord.ext import commands
-from discord import app_commands
 from dotenv import load_dotenv
 from datetime import datetime, timezone
-from rich.progress import Progress
 
-log = logging.getLogger("sharded")
-log.addHandler(RichHandler(markup = True, console = Console()))
-log.setLevel(logging.DEBUG)
+log = logging.getLogger("discord")
+log.handlers = []
+log.addHandler(RichHandler(console=Console(), rich_tracebacks=True))
+log.setLevel(logging.INFO)
+log.propagate = False
 
+discord.utils.LOGGING_HANDLER = log.handlers[0]
+discord.utils.LOGGING_FORMATTER = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', '%Y-%m-%d %H:%M:%S', style='{')
+
+for name in [n for n in logging.root.manager.loggerDict if n.startswith('discord.')]:
+    logger = logging.getLogger(name)
+    logger.handlers, logger.propagate = [log.handlers[0]], False
+    cogs = ['cogs.example_cog']
 log.info("Started Sharded logging service")
 
-with Progress() as progress:
-    task = progress.add_task("Loading .env file...", total=100)
-    for i in range(100):
-        load_dotenv()
-        progress.update(task, advance=1)
+load_dotenv()
+log.info("Loaded .env file")
 
-log.info("Loading environment variables into sharded runtime.")
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 DISCORD_PREFIX = os.getenv('DISCORD_PREFIX')
 USE_SHARDED_SERVERS = os.getenv('USE_SHARDED_SERVERS')
-GUILD_ID = discord.Object(id=os.getenv('GUILD_ID'))
+# GUILD_ID = discord.Object(id=os.getenv('GUILD_ID'))
 
 # Discord Clients and Classes
 log.info("Starting Sharded client and runtime")
@@ -56,8 +59,16 @@ class Client(commands.Bot):
 
         await guild_owner.send(embed=embed)
 
-    async def setup_hook(self):
-        await self.tree.sync(guild = GUILD_ID)
+
+    async def setup_hook(self): 
+        for filename in os.listdir('./sharded/cogs'):
+            if filename.endswith('.py'):
+                try:
+                    await self.load_extension(f'cogs.{filename[:-3]}')
+                    log.debug('Loaded extension: %s', filename[:-3])
+                except Exception as e:
+                    log.error('Failed to load extension %s: %s', filename, e)
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -87,15 +98,19 @@ class DestructiveConfirmationMenu(discord.ui.View):
         else:
             await interaction.response.send_message("You are not the user who initiated this action.", ephemeral=True)
             return False
+
 # Commands
 
-@client.hybrid_command(name = "ping", help="Pings the bot and returns the latency.", with_app_command=True)
-@app_commands.guilds(GUILD_ID)
-async def ping(ctx: commands.Context):
+@client.command(help="Pings the bot and returns the latency.")
+async def ping(ctx):
+
     embed=discord.Embed(title="Results", description="Pong!", color=0x351aff)
     embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1319824973233127515/d5059475af7a9aa9def8e2be7ac0c8f3.png?size=1024")
     embed.add_field(name="Latency (ms)", value=f"{round(client.latency * 1000)}ms", inline=True)
-    embed.add_field(name="Session ID", value=f"{client.ws.session_id}", inline=True)
+    embed.add_field(name="Guild ID", value=f"{ctx.guild.id}", inline=True)
+    embed.add_field(name="Shard", value=f"{ctx.guild.shard_id}", inline=True)
+
+    embed.add_field(name="Session ID", value=f"{client.ws.session_id}", inline=False)
 
     embed.set_footer(text="v0.1.0 Closed BETA | Developed by Sharded Interactive")
 
@@ -110,33 +125,35 @@ async def purge(ctx, amount: int):
     amount = amount + 1
 
     if amount-1 >= 100:
-        guild_owner_id = ctx.guild.owner_id
-        member = await ctx.guild.fetch_member(guild_owner_id)
 
-        now_utc = datetime.now(timezone.utc)
-        formatted_time = now_utc.strftime("%H:%M %B %d, %Y")
-
-        embed=discord.Embed(title="Destructive Action", 
-                            description=f"A user ran a *destructive action* (purge) and **affected {amount} messages** within one of your servers. We recommend reviewing this action due to the large amount of messages affected. Below is additional information about this action:",
-                            color=0x351aff)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1319824973233127515/d5059475af7a9aa9def8e2be7ac0c8f3.png?size=1024")
-
-        embed.add_field(name="Destructive Action", value="Purge Command", inline=True)
-        embed.add_field(name="Affected...", value=f"{amount-1} messages", inline=True)
-        embed.add_field(name="Was ran by...", value=f"<@{ctx.author.id}>", inline=True)
-        embed.add_field(name="At... (UTC)", value=formatted_time, inline=True)
-        embed.add_field(name="In the discord server...", value=ctx.message.guild.name, inline=True)
-
-        embed.set_footer(text="v0.1.0 Closed BETA | Developed by Sharded Interactive")
-        await member.send(embed=embed)
-
-        await ctx.send(f"Are you sure you want to purge {amount-1} messages?", view=CM)
+        await ctx.send(f"Are you sure you want to purge {amount-1} messages?", view=CM, delete_after=30)
 
         if CM.value is None:
             await CM.wait()
             if CM.value:
                 alreadyPurged = True
                 await ctx.channel.purge(limit=amount)
+
+                guild_owner_id = ctx.guild.owner_id
+                member = await ctx.guild.fetch_member(guild_owner_id)
+
+                now_utc = datetime.now(timezone.utc)
+                formatted_time = now_utc.strftime("%H:%M %B %d, %Y")
+
+                embed = discord.Embed(title="Destructive Action", 
+                                    description=f"A user ran a *destructive action* (purge) and **affected {amount} messages** within one of your servers. We recommend reviewing this action due to the large amount of messages affected. Below is additional information about this action:",
+                                    color=0x351aff)
+                embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1319824973233127515/d5059475af7a9aa9def8e2be7ac0c8f3.png?size=1024")
+
+                embed.add_field(name="Destructive Action", value="Purge Command", inline=True)
+                embed.add_field(name="Affected...", value=f"{amount-1} messages", inline=True)
+                embed.add_field(name="Was ran by...", value=f"<@{ctx.author.id}>", inline=True)
+                embed.add_field(name="At... (UTC)", value=formatted_time, inline=True)
+                embed.add_field(name="In the discord server...", value=ctx.message.guild.name, inline=True)
+
+                embed.set_footer(text="v0.1.0 Closed BETA | Developed by Sharded Interactive")
+                await member.send(embed=embed)
+
                 await ctx.send(f"Successfully purged {amount-1} messages.", delete_after=5)
             else:
                 alreadyPurged = True
@@ -147,10 +164,11 @@ async def purge(ctx, amount: int):
         await ctx.send(f"Successfully purged {amount-1} messages.", delete_after=5)
     else:
         pass
-    
+
 if __name__ == '__main__':
+
     if not USE_SHARDED_SERVERS:
         print(Panel('Make sure your [yellow].env[/yellow] file is setup properly for the self hosted instance.', title="Warning", expand=False))
     else:
         pass
-    client.run(DISCORD_TOKEN, log_handler=RichHandler(markup = True, console = Console()))
+    client.run(DISCORD_TOKEN, root_logger=True, log_handler=RichHandler(markup = True, console = Console()))
