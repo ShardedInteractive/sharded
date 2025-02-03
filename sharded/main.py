@@ -1,12 +1,14 @@
 import logging
 import discord
 import os
+import wavelink
 # skipcq: PYL-W0622
 from rich import print
 from rich.logging import RichHandler
 from rich.console import Console
 from discord.ext import commands
 from API.config import Environment
+from typing import cast
 
 log = logging.getLogger("discord")
 log.handlers = []
@@ -17,13 +19,13 @@ log.propagate = False
 discord.utils.LOGGING_HANDLER = log.handlers[0]
 discord.utils.LOGGING_FORMATTER = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', '%Y-%m-%d %H:%M:%S', style='{')
 
-for name in [n for n in logging.root.manager.loggerDict if n.startswith('discord.')]:
+for name in [n for n in logging.root.manager.loggerDict if n.startswith('discord.') or n.startswith('wavelink.')]:
     logger = logging.getLogger(name)
     logger.handlers, logger.propagate = [log.handlers[0]], False
     cogs = ['cogs.moderation']
 log.info("Started Sharded logging service")
 
-env = Environment.load_key(provider="dynamic")
+env = Environment.vital(provider="dynamic")
 
 DISCORD_TOKEN = env["DISCORD_TOKEN"]
 DISCORD_PREFIX = env["DISCORD_PREFIX"]
@@ -46,7 +48,7 @@ class Client(commands.Bot):
         guild_owner = await self.fetch_user(guild.owner_id)
 
         embed = discord.Embed(title="Hey! Thank you for inviting me to your server!",
-                      description="Learn more and customize your sharded instance by going to [sharded.app](https://sharded.app) and logging in! Get started by doing `/help` or `!help`",
+                      description="Learn more and customize your sharded instance by going to [sharded.app](https://sharded.app) and logging in! Get started by doing `/help`",
                       colour=0x351aff)
 
         embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1319824973233127515/d5059475af7a9aa9def8e2be7ac0c8f3.png?size=1024")
@@ -62,7 +64,10 @@ class Client(commands.Bot):
         await guild_owner.send(embed=embed)
 
 
-    async def setup_hook(self): 
+    async def setup_hook(self) -> None:
+
+        await wavelink.Pool.connect(nodes=nodes, client=self, cache_capacity=100)
+
         for filename in os.listdir('./sharded/cogs'):
             if filename.endswith('.py'):
                 try:
@@ -70,6 +75,31 @@ class Client(commands.Bot):
                     log.debug('Loaded extension: %s', filename[:-3])
                 except Exception as e:
                     log.error('Failed to load extension %s: %s', filename, e)
+
+    async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload) -> None:
+        log.info("Wavelink Node connected: %r | Resumed: %s", payload.node, payload.resumed)
+
+    async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+        if not player:
+            return
+
+        original: wavelink.Playable | None = payload.original
+        track: wavelink.Playable = payload.track
+
+        embed: discord.Embed = discord.Embed(title="Now Playing")
+        embed.description = f"**{track.title}** by `{track.author}`"
+
+        if track.artwork:
+            embed.set_image(url=track.artwork)
+
+        if original and original.recommended:
+            embed.description += f"\n\n`This track was recommended via {track.source}`"
+
+        if track.album.name:
+            embed.add_field(name="Album", value=track.album.name)
+
+        await player.home.send(embed=embed)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -88,10 +118,9 @@ async def ping(interaction: discord.Interaction):
 
     embed.add_field(name="Session ID", value=f"{client.ws.session_id}", inline=False)
 
-    embed.set_footer(text="v0.1.0 Closed BETA | Developed by Sharded Interactive")
+    embed.set_footer(text="Managed Enterprise License | Developed by Sharded Interactive")
 
     await interaction.response.send_message(embed=embed)
-
 
 if __name__ == '__main__':
     client.run(DISCORD_TOKEN, root_logger=True, log_handler=RichHandler(markup = True, console = Console()))

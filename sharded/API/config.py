@@ -10,8 +10,17 @@ class Environment:
     load_dotenv()
     
     @staticmethod
-    def load_key(key: str = None, provider: str = None) -> str:
-        "Returns a environment variable with a provided key or in other words, the name of the variable."
+    def vital(key: str = None, provider: str = None) -> str:
+        """vital is a method that provides a way to dynamically or static load important environment variables from a `.env` file.
+
+        Args:
+            key (str): The value in which you want to receive from the environment. (Can be optional if `dynamic` is the provider.)
+            provider (str): `static` will only get you the requested environmental variable. `dynamic` will give you access to a database for easier access to environmental variables. Defaults to `static`.
+
+        Returns:
+            str: The value of the environmental variable requested.
+            dict: If `provider` is set to `dynamic`, a dictionary will be returned with all the environmental variables loaded into a temporary database.
+        """
 
         database = {
             "DISCORD_TOKEN": os.getenv('DISCORD_TOKEN'),
@@ -20,8 +29,15 @@ class Environment:
         }
 
         if provider == "static":
+            if key not in database:
+                log.error(f"[red]API.config[/red] - The key, `{key}` was not found in the database.")
+                return None
+            log.warning(f"[green]API.config[/green] - The key, `{key}` was loaded from the database.")
             return database[key]
         elif provider == "dynamic":
-            log.warning("[green]API.config[/green] - Environment variable were loaded into a temporary OR permanent database for dynamic access to keys or unknown.")
+            log.warning("[green]API.config[/green] - Vital variables were loaded into a temporary OR permanent database for dynamic access to keys or unknown.")
             return database
+        else:
+            log.error("[red]API.config[/red] - Provider was not set to `dynamic` or `static`. Please set the provider to either of the two options.")
+            return None
 
