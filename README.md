@@ -1,14 +1,11 @@
 ![Sharded Banner](imgs/sharded-banner.png)
 
-<a href="https://app.deepsource.com/gh/ShardedInteractive/sharded/" target="_blank"><img alt="DeepSource" title="DeepSource" src="https://app.deepsource.com/gh/ShardedInteractive/sharded.svg/?label=code+coverage&show_trend=true&token=NSg646cppOlj7FdQYm4fFR7C"/>
-</a>
-
 # Sharded
 
 >[!WARNING]
 >All **sharded products and services** are under major development and may be unstable at times.
 
-**Sharded** is a python powered discord bot which brings power to the users. It's designed to be **powerful yet simple,** get started today at [sharded.app](https://sharded.app) with **our servers** or **self-host with your own servers** and be able to customize everything.
+**Sharded** is a python-powered discord bot which brings power to the users. It's designed to be **powerful yet simple,** get started today at [sharded.app](https://sharded.app) with **our servers** or **self-host with your own servers** and be able to customize everything.
 
 > *"Powerful discord bots shouldn't be locked behind massive paywalls or closed source."* - Adam, Lead Maintainer.
 
