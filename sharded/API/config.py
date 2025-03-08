@@ -1,7 +1,12 @@
 import logging
 import discord
 import os
+import configparser
+import requests
 from dotenv import load_dotenv
+from rich.progress import Progress, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
+from rich.panel import Panel
+from rich.console import Console
 
 log = logging.getLogger("discord")
 
@@ -30,12 +35,12 @@ class Environment:
 
         if provider == "static":
             if key not in database:
-                log.error(f"[red]API.config[/red] - The key, `{key}` was not found in the database.")
+                log.error(f"[red]API.config[/red] - The key, `{key}` was not found in the environment.")
                 return None
-            log.warning(f"[green]API.config[/green] - The key, `{key}` was loaded from the database.")
+            log.warning(f"[green]API.config[/green] - The key, `{key}` was loaded from the environment.")
             return database[key]
         elif provider == "dynamic":
-            log.warning("[green]API.config[/green] - Vital variables were loaded into a temporary OR permanent database for dynamic access to keys or unknown.")
+            log.warning("[green]API.config[/green] - Vital variables were loaded into a temporary OR permanent list for dynamic access to keys or unknown.")
             return database
         else:
             log.error("[red]API.config[/red] - Provider was not set to `dynamic` or `static`. Please set the provider to either of the two options.")
