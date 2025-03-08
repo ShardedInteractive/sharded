@@ -55,7 +55,7 @@ class Client(commands.Bot):
                       colour=0x351aff)
 
         embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/1319824973233127515/d5059475af7a9aa9def8e2be7ac0c8f3.png?size=1024")
-        embed.set_footer(text="v0.1.0 Closed BETA | Developed by Sharded Interactive")
+        embed.set_footer(text="Developed by Sharded Interactive")
 
         embed.add_field(name="Open-Source",
                         value="Sharded is always open-source and free to self-host, learn more at our [GitHub project.](https://github.com/shardedinteractive/sharded)",

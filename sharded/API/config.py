@@ -46,3 +46,64 @@ class Environment:
             log.error("[red]API.config[/red] - Provider was not set to `dynamic` or `static`. Please set the provider to either of the two options.")
             return None
 
+class Configuration():
+
+    def __init__(self):
+        self.config = configparser.ConfigParser()
+
+        # Get user's home directory and create sharded directory there
+        home_dir = os.path.expanduser('~')
+        config_dir = os.path.join(home_dir, '.sharded')
+        os.makedirs(config_dir, exist_ok=True)
+        
+        # Config file path in user's home directory
+        config_path = os.path.join(config_dir, 'sharded.ini')
+        
+        # If config file doesn't exist, download from GitHub
+        if not os.path.exists(config_path):
+            console = Console()
+
+            console.print(Panel(
+            "[yellow]Configuration file not found.[/yellow]\nAttempting to download latest configuration from GitHub...",
+            title="Config Status",
+            border_style="cyan"
+            ))
+
+            try:
+                url = 'https://raw.githubusercontent.com/ShardedInteractive/sharded/main/defaults/sharded.ini'
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+                total_size = int(response.headers.get('content-length', 0))
+
+                with Progress(
+                    "[progress.description]{task.description}",
+                    DownloadColumn(),
+                    TransferSpeedColumn(),
+                    TimeRemainingColumn(),
+                ) as progress:
+                    task = progress.add_task("[cyan]Downloading config...", total=total_size)
+                    
+                    with open(config_path, 'wb') as configfile:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                configfile.write(chunk)
+                                progress.update(task, advance=len(chunk))
+
+                console.print(Panel(
+                    "[green]Successfully downloaded default configuration from GitHub[/green]",
+                    title="Download Complete",
+                    border_style="green"
+                ))
+            except Exception as e:
+                console.print(Panel(
+                    f"[red]Failed to download configuration:[/red]\n{str(e)}",
+                    title="Error",
+                    border_style="red"
+                ))
+            
+        self.config.read(config_path)
+
+    
+    def get(self, section: str, key: str) -> str:
+        value = self.config.get(section, key)
+        return value
