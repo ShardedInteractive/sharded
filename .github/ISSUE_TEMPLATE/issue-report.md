@@ -1,6 +1,6 @@
 ---
 name: Issue Report
-about: Create a Issue regarding to codebase and or runtime errors
+about: Create an issue regarding the codebase and/or runtime errors
 title: "[BUG] - "
 labels: bug
 assignees: ''
