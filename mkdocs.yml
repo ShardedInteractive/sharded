@@ -1,13 +1,18 @@
 site_name: Sharded
 site_url: https://docs.sharded.app/
 
+site_description: >
+  Sharded is a python powered discord bot that powers your server with
+  advanced moderation, customization, and self-hosted features.
+
 repo_name: shardedinteractive/sharded
 repo_url: https://github.com/shardedinteractive/sharded
 edit_uri: edit/main/docs/
 
 nav:
-  - Home:
+  - Getting Started:
     - index.md
+    - "Basic Configuration": basic.md
   - Blog:
     - blog/index.md
 
@@ -36,7 +41,7 @@ theme:
         icon: material/brightness-4
         name: Switch to system preference
   font:
-    text: "Assistant"
+    text: "Roboto"
     code: " JetBrains Mono"
 
   logo: "assets/sharded_transparent.png"
@@ -68,6 +73,13 @@ plugins:
   - search
   - blog
   - offline
+  - git-revision-date-localized:
+      enable_creation_date: true
+      fallback_to_build_date: true
+      type: date
+  - git-committers:
+      repository: shardedinteractive/sharded
+      branch: main
 
 markdown_extensions:
   - pymdownx.highlight:
