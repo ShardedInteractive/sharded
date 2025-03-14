@@ -1,16 +1,9 @@
-FROM python:3.13-slim
+FROM python:3.12-alpine
 LABEL org.opencontainers.image.source https://github.com/shardedinteractive/sharded
 
-# Set the working directory
-COPY . /app
-WORKDIR /app
+COPY ./sharded .
 
-# Remove all files except the sharded directory
-RUN find . -mindepth 1 ! -regex '^./sharded\(/.*\)?' -delete
-
-# Install the dependencies
-
-RUN pip install discord.py rich python-dotenv
+RUN pip install discord.py rich python-dotenv requests
 
 # Run the container
-CMD ["python", "./sharded/main.py"]
+CMD ["python", "main.py"]
