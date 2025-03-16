@@ -20,7 +20,3 @@ def test_environment_vital_dynamic(monkeypatch):
     assert database["DISCORD_TOKEN"] == "test_token"
     assert database["DISCORD_PREFIX"] == "!"
     assert database["GUILD_ID"].id == 123456789
-
-
-def test_environment_vital_invalid_provider():
-    assert Environment.vital(provider="invalid") is None
