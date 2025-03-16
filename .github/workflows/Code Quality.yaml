@@ -64,4 +64,4 @@ jobs:
               uses: actions/checkout@v4
             - name: Install uv
               uses: ./.github/actions/setup
-            - run: uv run build
+            - run: uv build
