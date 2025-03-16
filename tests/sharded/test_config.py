@@ -1,5 +1,6 @@
 from sharded.API.config import Environment
 
+
 def test_environment_vital_static(monkeypatch):
     monkeypatch.setenv("DISCORD_TOKEN", "test_token")
     monkeypatch.setenv("DISCORD_PREFIX", "!")
