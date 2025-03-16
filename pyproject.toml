@@ -1,0 +1,20 @@
+[project]
+name = "sharded"
+version = "0.1.0"
+description = "Sharded is a python powered discord bot which aims to bring advanced moderation, community management features, and customization to the users."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "discord-py[voice]>=2.5.2",
+    "python-dotenv>=1.0.1",
+    "requests>=2.32.3",
+    "rich>=13.9.4",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.396",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.11.0",
+]

@@ -1,0 +1,65 @@
+name: Sharded Code Quality
+on: [push]
+jobs:
+    lockfile:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Install uv
+              uses: ./.github/actions/setup
+            - run: uv lock --locked
+
+    linting:
+        runs-on: ubuntu-latest
+        needs: [lockfile]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Install uv
+              uses: ./.github/actions/setup
+            - run: uvx ruff check .
+
+    formatting:
+        runs-on: ubuntu-latest
+        needs: [lockfile]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Install uv
+              uses: ./.github/actions/setup
+            - run: uvx ruff format .
+
+    # type_checking:
+    #     runs-on: ubuntu-latest
+    #     needs: [lockfile]
+    #     steps:
+    #         - name: Checkout
+    #           uses: actions/checkout@v4
+    #         - name: Install uv
+    #           uses: ./.github/actions/setup
+    #         - run: uv run pyright .
+
+    unit_testing:
+        runs-on: ubuntu-latest
+        needs: [lockfile]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Install uv
+              uses: ./.github/actions/setup
+            - run: uv run pytest -v --durations=0 --cov --cov-report=xml
+            - name: Upload coverage
+              uses: codecov/codecov-action@v4
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+
+    build:
+        runs-on: ubuntu-latest
+        needs: [lockfile, linting, formatting, unit_testing]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Install uv
+              uses: ./.github/actions/setup
+            - run: uv run build
