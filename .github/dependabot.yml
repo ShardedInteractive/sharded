@@ -14,13 +14,6 @@ updates:
       time: "12:00"
       timezone: "America/Chicago"
 
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: weekly
-      time: "12:00"
-      timezone: "America/Chicago"
-
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
