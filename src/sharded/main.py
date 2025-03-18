@@ -1,13 +1,11 @@
 import logging
 import discord
 import os
-
-# skipcq: PYL-W0622
 from rich import print
 from rich.logging import RichHandler
 from rich.console import Console
 from discord.ext import commands
-from API.config import Environment, Configuration
+from sharded.API.config import Environment, Configuration
 
 log = logging.getLogger("discord")
 log.handlers = []
@@ -23,7 +21,7 @@ discord.utils.LOGGING_FORMATTER = logging.Formatter(
 for name in [
     n
     for n in logging.root.manager.loggerDict
-    if n.startswith("discord.") or n.startswith("wavelink.")
+    if n.startswith("discord.")
 ]:
     logger = logging.getLogger(name)
     logger.handlers, logger.propagate = [log.handlers[0]], False
@@ -76,14 +74,14 @@ class Client(commands.Bot):
         )
         embed.add_field(
             name="Join our support server!",
-            value="Get help or connect with our community at discord.gg/4BK9vjpg87 or at our GitHub Discussions.",
+            value="Get help or connect with our community at `discord.gg/4BK9vjpg87` or at our GitHub Discussions.",
             inline=False,
         )
 
         await guild_owner.send(embed=embed)
 
     async def setup_hook(self) -> None:
-        for filename in os.listdir("./sharded/cogs"):
+        for filename in os.listdir("./src/sharded/cogs"):
             if filename.endswith(".py"):
                 try:
                     await self.load_extension(f"cogs.{filename[:-3]}")
