@@ -1,22 +1,19 @@
 ![Sharded Banner](imgs/sharded-banner.png)
 
 # Sharded
+![Codecov](https://img.shields.io/codecov/c/github/shardedinteractive/sharded)
+![PyPI - Version](https://img.shields.io/pypi/v/sharded)
+![Discord](https://img.shields.io/discord/1276739079878348842?logo=discord&logoColor=white&label=Support%20Server)
+
+Sharded is a python powered discord bot which aims to bring advanced moderation, community management features, and customization to the users. 
+
 
 >[!WARNING]
->All **sharded products and services** are under major development and may be unstable at times.
+>**Active Development**
+>***
+> Sharded *(including Services, Addons, and CLI)* is currently under active development as many aspects of documentation, features, and codebase are subject to change or removed.
 
-**Sharded** is a python-powered discord bot which brings power to the users. It's designed to be **powerful yet simple,** get started today at [sharded.app](https://sharded.app) with **our servers** or **self-host with your own servers** and be able to customize everything.
-
-> *"Powerful discord bots shouldn't be locked behind massive paywalls or closed source."* - Adam, Lead Maintainer.
-
-## Installing sharded
->[!WARNING]
->Installation methods are set to change in the near future. Currently we only support self-hosting but we have plans to introduce sharded cloud.
-
-Sharded is a docker project hosted on GitHub Packages with `latest` being currently its only tag. **Keep in mind every push is being updated to the `latest` tag.**
-
-You can pull the image by running,
-
-```bash
-docker pull ghcr.io/shardedinteractive/sharded:latest
-```
+>[!DANGER]
+>**Self-Hosting Sharded**
+>***
+> In the current state of development, self-hosting sharded is considered really difficult as many processes and systems aren't setup (or closed testing) so we ask to be patient if certain documentation isn't setup.
