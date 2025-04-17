@@ -13,7 +13,7 @@ Sharded is a python powered discord bot which aims to bring advanced moderation,
 >***
 > Sharded *(including Services, Addons, and CLI)* is currently under active development as many aspects of documentation, features, and codebase are subject to change or removed.
 
->[!DANGER]
+>[!CAUTION]
 >**Self-Hosting Sharded**
 >***
 > In the current state of development, self-hosting sharded is considered really difficult as many processes and systems aren't setup (or closed testing) so we ask to be patient if certain documentation isn't setup.
