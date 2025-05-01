@@ -5,28 +5,28 @@ labels: documentation
 projects: "Sharded"
 
 body:
-  - type: markdown
-    attributes:
-      value: |
-          Thank you for taking the time to provide feedback on Sharded's documentation. Your input is invaluable in 
-          helping us improve our resources and better serve our community.
+- type: markdown
+  attributes:
+    value: |
+        Thank you for taking the time to provide feedback on Sharded's documentation. Your input is invaluable in 
+        helping us improve our resources and better serve our community.
           
-          Please fill out the following sections to help us understand your feedback better.
-  - type: textarea
-    id: feedback
-    attributes:
-        label: What feedback do you have?
-        description: |
+        Please fill out the following sections to help us understand your feedback better.
+- type: textarea
+  id: feedback
+  attributes:
+      label: What feedback do you have?
+      description: |
           Be descriptive when providing feedback to help us understand your thoughts and suggestions so we
           can improve our documentation.
-        placeholder: "Please provide your feedback here..."
-    validations:
+      placeholder: "Please provide your feedback here..."
+  validations:
+      required: true
+- type: checkboxes
+  id: terms
+  attributes:
+    label: Code of Conduct
+    description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/ShardedInteractive/sharded/blob/5ae390f336adff51d4fcf193192377f2db3e27d4/CODE_OF_CONDUCT.md).
+    options:
+      - label: I agree to follow this project's Code of Conduct
         required: true
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/ShardedInteractive/sharded/blob/5ae390f336adff51d4fcf193192377f2db3e27d4/CODE_OF_CONDUCT.md).
-      options:
-        - label: I agree to follow this project's Code of Conduct
-          required: true

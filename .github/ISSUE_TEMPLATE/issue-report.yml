@@ -1,7 +1,8 @@
 name: Issue Report
 description: Report a bug or issue with Sharded.
-title: "[BUG] <title>"
+title: "[Bug] - "
 labels: ["bug"]
+projects: "Sharded"
 body:
 - type: checkboxes
   attributes:
