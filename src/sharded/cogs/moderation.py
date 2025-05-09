@@ -2,13 +2,11 @@ import logging
 import discord
 from discord import app_commands
 from discord.ext import commands
-from API.config import Environment
+from sharded.config import Environment
 
 log = logging.getLogger("discord")
 
-GUILD_ID = Environment.vital("GUILD_ID", "static")
-
-
+GUILD_ID = discord.Object(id=int(Environment().vital("GUILD_ID", "static")))
 class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -27,7 +25,7 @@ class Moderation(commands.Cog):
 
     @commands.hybrid_command(name="kick", description="Kick a user from the server.")
     @app_commands.guilds(GUILD_ID)
-    # @commands.has_permissions(kick_members=True)
+    @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason: str):
         if ctx.author.top_role <= member.top_role:
             await ctx.send(
@@ -41,9 +39,44 @@ class Moderation(commands.Cog):
     @commands.hybrid_command(name="ban", description="Ban a user from the server.")
     @app_commands.guilds(GUILD_ID)
     # @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member, *, reason: str):
-        # await member.ban(reason=reason)
-        await ctx.send(f"Banned {member.mention} from the server for {reason}.")
+    async def ban(self, ctx, member: discord.Member, *, reason: str, blacklist: bool = False):
+
+        if ctx.author.top_role <= member.top_role:
+            await ctx.send(
+                "You cannot ban a member with a higher or equal role than you.",
+                ephemeral=True,
+            )
+            return
+        
+        if blacklist:
+            class BlacklistModal(discord.ui.Modal, title="Blacklist"):
+                reason = discord.ui.TextInput(
+                    label="Explanation for blacklisting",
+                    style=discord.TextStyle.paragraph,
+                    required=True,
+                    min_length=30,
+                    max_length=500,
+                    placeholder="Please provide a detailed reason for blacklisting for review.",
+                )
+
+                signature = discord.ui.TextInput(
+                    label="Enter your username for confirmation.",
+                    style=discord.TextStyle.short,
+                    required=True,
+                    placeholder="Enter username to certify.",
+                )
+
+                async def on_submit(self, interaction: discord.Interaction):
+                    # Add the member to the blacklist here
+                    log.info(f"Blacklisted {member} for: {self.reason.value}")
+                    await interaction.response.send_message(
+                        f"{member.mention} has been sent for review for a [possible blacklist.](https://sharded.app)",
+                        ephemeral=True,
+                    )
+
+            await ctx.interaction.response.send_modal(BlacklistModal())
+
+        await ctx.send(f"Testing ban {member.mention} for: {reason}")
 
     @commands.hybrid_command(name="unban", description="Unban a user from the server.")
     @app_commands.guilds(GUILD_ID)

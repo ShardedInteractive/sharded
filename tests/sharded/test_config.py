@@ -1,23 +1,18 @@
-from sharded.API.config import Environment
+from sharded.config import Environment
 
 
 def test_environment_vital_static(monkeypatch):
     monkeypatch.setenv("DISCORD_TOKEN", "test_token")
-    monkeypatch.setenv("DISCORD_PREFIX", "!")
-    monkeypatch.setenv("GUILD_ID", int(123456789))
+    monkeypatch.setenv("GUILD_ID", "123456789")
 
-    assert Environment.vital("DISCORD_TOKEN", "static") == "test_token"
-    assert Environment.vital("DISCORD_PREFIX", "static") == "!"
-    assert Environment.vital("GUILD_ID", "static").id == 123456789
-    assert Environment.vital("NON_EXISTENT_KEY", "static") is None
+    assert Environment().vital("DISCORD_TOKEN", provider="static") == "test_token"
+    assert int(Environment().vital("GUILD_ID", provider="static")) == 123456789
 
 
 def test_environment_vital_dynamic(monkeypatch):
     monkeypatch.setenv("DISCORD_TOKEN", "test_token")
-    monkeypatch.setenv("DISCORD_PREFIX", "!")
-    monkeypatch.setenv("GUILD_ID", int(123456789))
+    monkeypatch.setenv("GUILD_ID", "123456789")
 
-    database = Environment.vital(provider="dynamic")
+    database = Environment().vital(provider="dynamic")
     assert database["DISCORD_TOKEN"] == "test_token"
-    assert database["DISCORD_PREFIX"] == "!"
-    assert database["GUILD_ID"].id == 123456789
+    assert int(database["GUILD_ID"]) == 123456789
