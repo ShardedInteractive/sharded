@@ -9,10 +9,12 @@ repos:
       - id: ruff
         args: [ --fix ]
       - id: ruff-format
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.387
-    hooks:
-      - id: pyright
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.387
+  #   hooks:
+  #     - id: pyright
+  # Due to the state of development, we are not using pyright for now, we are trying to add all the code
+  # to be typed, and then we will use pyright to check the types.
   - repo: local
     hooks:
       - id: pytest

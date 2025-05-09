@@ -1,15 +1,23 @@
 [project]
-name = "sharded"
-version = "0.1.0"
+name = "shardedbot"
+version = "0.0.1"
 description = "Sharded is a python powered discord bot which aims to bring advanced moderation, community management features, and customization to the users."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.9"
 dependencies = [
+    "appwrite==10.0.0",
     "discord-py[voice]>=2.5.2",
     "python-dotenv>=1.0.1",
     "requests>=2.32.3",
     "rich>=13.9.4",
+    "typer>=0.15.2",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sharded"]
+
+[project.scripts]
+sharded = "sharded.CLI.main:app"
 
 [dependency-groups]
 dev = [
