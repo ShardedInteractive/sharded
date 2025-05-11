@@ -5,10 +5,13 @@ from discord import app_commands
 from rich import print
 from rich.logging import RichHandler
 from rich.console import Console
+from rich.traceback import install as install_rich_traceback
 from discord.ext import commands
 from sharded.config import Environment, Configuration
 from sharded.services import Services
 from typing import Optional, cast
+
+install_rich_traceback(show_locals=True)
 
 log = logging.getLogger("discord")
 log.handlers = []
@@ -78,7 +81,7 @@ class Client(commands.Bot):
         )
 
         embed.set_thumbnail(
-            url="https://cdn.discordapp.com/avatars/1319824973233127515/d5059475af7a9aa9def8e2be7ac0c8f3.png?size=1024"
+            url="https://cdn.sharded.app/sharded.png?size=1024"
         )
         embed.set_footer(text="Developed by Sharded Interactive")
 
@@ -131,7 +134,7 @@ async def ping(ctx: commands.Context):
     server_status = services.server_verified(int(ctx.guild.id))
     verified = server_status["verified"]
     verified_name = server_status["name"]
-    
+
     if verified:
         embed.add_field(
             name="Sharded Verification - ✅",
@@ -157,7 +160,7 @@ async def ping(ctx: commands.Context):
 
 @client.tree.context_menu(name="User Information", guild=GUILD_ID)
 async def user_info(interaction: discord.Interaction, user: discord.Member) -> None:
-    guild = client.get_guild(interaction.guild_id) 
+    guild = client.get_guild(interaction.guild_id)
 
     if guild.get_member(user.id) is not None:
         embed_color: discord.Colour = user.accent_color or discord.Colour(0x351AFF)
@@ -175,7 +178,7 @@ async def user_info(interaction: discord.Interaction, user: discord.Member) -> N
         embed.set_footer(text=f"ID: {user.id} - Developed by Sharded Interactive")
         await interaction.response.send_message(embed=embed, ephemeral=True)
         return
-    
+
     else:
         highest_role: Optional[discord.Role] = max(
             (role for role in user.roles if role.name != "@everyone"),
@@ -214,7 +217,7 @@ async def user_info(interaction: discord.Interaction, user: discord.Member) -> N
         )
 
         embed.set_footer(text=f"ID: {user.id} - Developed by Sharded Interactive")
-        
+
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 if __name__ == "__main__":
