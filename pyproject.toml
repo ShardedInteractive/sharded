@@ -5,7 +5,7 @@ description = "Sharded is a python powered discord bot which aims to bring advan
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "appwrite==10.0.0",
+    "appwrite==11.0.0",
     "discord-py[voice]>=2.5.2",
     "python-dotenv>=1.0.1",
     "requests>=2.32.3",
